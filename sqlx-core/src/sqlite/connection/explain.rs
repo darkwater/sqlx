@@ -86,19 +86,26 @@ pub(super) async fn explain(
 
     let mut program_i = 0;
     let program_size = program.len();
+    let mut visited = vec![false; program_size];
 
     while program_i < program_size {
+        if visited[program_i] {
+            program_i += 1;
+            continue;
+        }
         let (_, ref opcode, p1, p2, p3, ref p4) = program[program_i];
 
         match &**opcode {
             OP_INIT => {
                 // start at <p2>
+                visited[program_i] = true;
                 program_i = p2 as usize;
                 continue;
             }
 
             OP_GOTO => {
                 // goto <p2>
+                visited[program_i] = true;
                 program_i = p2 as usize;
                 continue;
             }
@@ -230,6 +237,7 @@ pub(super) async fn explain(
             }
         }
 
+        visited[program_i] = true;
         program_i += 1;
     }
 
